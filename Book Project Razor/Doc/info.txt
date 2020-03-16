@@ -1,0 +1,87 @@
+Projekt C# - ASP.NET CORE 3.1
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+Dziêki tej paczce i zmianie wpisu umo¿liwa stostoawnie zmian po zapisaniu bez prze³adowywania projektu
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+1. Instalujemy nuget pakiet:
+	-> Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation.
+2. W pliku "Startup.cs" zmieniamy w metodzie "ConfigureServices" serwis 
+	-> z  "services.AddRazorPages();" na " services.AddRazorPages().AddRazorRuntimeCompilation();".
+
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+Tworzymy model(tabeli) i po³¹czenie z baz¹ danych MSSQL z wykorzystaniem EntityFrameworkCore
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+1. Instalujemy nuget pakiet:
+	-> Microsoft.EntityFrameworkCore,
+	-> Microsoft.EntityFrameworkCore.SqlServer,
+	-> Microsoft.EntityFrameworkCore.Tools.
+2. Tworzymy model(tabeli) tworz¹c now¹ klasê najlepiej tworz¹c katalog "Model" i dodajemy zmienne:
+==================================================================================================
+using System.ComponentModel.DataAnnotations;
+
+namespace Book_Project_Razor.Model
+{
+    public class Book
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public string Name { get; set; }
+        public string Author { get; set; }
+    }
+}
+==================================================================================================
+3. Tworzymy tzw. CONNECTION STRING dla bazy danych dodaj¹c wpisy na pocz¹tku w pliku "appsetttings.json"
+==================================================================================================
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=DESKTOP-ERFIOBN\\SQLEXPRESS;Database=BookListRazor;Trusted_Connection=True;MultipleActiveResultSets=True"
+  },
+
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AllowedHosts": "*"
+}
+==================================================================================================
+4. Tworzymy klasê odpowiedzialn¹ za tworzenie tabeli i po³¹czenia
+==================================================================================================
+using Microsoft.EntityFrameworkCore;
+
+namespace Book_Project_Razor.Model
+{
+    //Dziedziczenie po klasie DbContext z EntityFramework
+    public class ApplicationDbContext : DbContext
+    {
+        // Konstruktor
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+
+        }
+
+        // Nazwa tabeli w bazie na podstawie wczeœniej stworzonego modelu(klasy) "Book"
+        public DbSet<Book> Books { get; set; }
+    }
+}
+==================================================================================================
+5. W pliku "Startup.cs" dodajemy w metodzie "ConfigureServices" serwis 
+	-> services.AddDbContext<ApplicationDbContext>(option => 
+       option.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+6. Zapisujmy wszystko i uruchamiamy "Package Manager Console" i wydajemy komendê:
+    -> add-migration AddBookToDb.
+7. Zosta³ utworzony skryp do stworzenia bazy danych z tabel¹ w katalogu "Migrations".
+8. Po sprawdzeniu skryptu uruchamiamy go i zostanie utworzona baza danych z tabel¹:
+    -> update-database.
+
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+Dziêki tej paczce i zmianie wpisu umo¿liwa stostoawnie zmian po zapisaniu bez prze³adowywania projektu
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
